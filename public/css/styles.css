@@ -1,0 +1,177 @@
+/* General Table Styles */
+.table-responsive {
+    overflow-x: auto;
+}
+
+/* Category Table Styles */
+.category-table {
+    margin-bottom: 0;
+}
+
+.category-table th {
+    font-weight: 500;
+    background-color: #f8f9fa;
+}
+
+.category-table .category-image {
+    width: 50px;
+    height: 50px;
+    object-fit: cover;
+}
+
+.category-table .placeholder-icon {
+    width: 50px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #f8f9fa;
+    border-radius: 4px;
+    color: #6c757d;
+}
+
+.category-table tbody tr {
+    transition: background-color 0.2s;
+}
+
+.category-table tbody tr:hover {
+    background-color: rgba(0,0,0,0.02);
+}
+
+/* Product Card Styles */
+.product-card {
+    transition: transform 0.2s;
+    border: 1px solid rgba(0,0,0,0.1);
+    height: 100%;
+}
+
+.product-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+
+.product-card .card-img-top {
+    height: 200px;
+    object-fit: cover;
+}
+
+.product-category-icon {
+    width: 30px;
+    height: 30px;
+    object-fit: cover;
+}
+
+.category-badge-icon {
+    width: 24px;
+    height: 24px;
+    object-fit: cover;
+    margin-right: 8px;
+    border-radius: 4px;
+}
+
+/* Pagination Styles */
+.pagination {
+    margin-bottom: 0;
+    gap: 5px;
+}
+
+.page-item:first-child .page-link,
+.page-item:last-child .page-link {
+    border-radius: 4px;
+}
+
+.page-link {
+    padding: 0.5rem 0.75rem;
+    color: #6c757d;
+    background-color: #fff;
+    border: 1px solid #dee2e6;
+    border-radius: 4px;
+    min-width: 38px;
+    text-align: center;
+    font-size: 14px;
+    margin: 0;
+    transition: all 0.2s;
+}
+
+.page-link:hover {
+    color: #0d6efd;
+    background-color: #e9ecef;
+    border-color: #0d6efd;
+    z-index: 2;
+}
+
+.page-item.active .page-link {
+    background-color: #0d6efd;
+    border-color: #0d6efd;
+    color: #fff;
+    font-weight: 500;
+}
+
+.page-item.disabled .page-link {
+    color: #6c757d;
+    pointer-events: none;
+    background-color: #f8f9fa;
+    border-color: #dee2e6;
+}
+
+/* Empty State Styles */
+.empty-state {
+    padding: 2rem 1rem;
+    text-align: center;
+}
+
+.empty-state i {
+    font-size: 2rem;
+    color: #6c757d;
+    margin-bottom: 1rem;
+}
+
+/* Button Group Styles */
+.action-buttons {
+    gap: 5px;
+}
+
+.action-buttons .btn {
+    padding: 0.25rem 0.5rem;
+}
+
+/* Image Preview Styles */
+.preview-image {
+    max-width: 100%;
+    border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+/* Category Breadcrumb */
+.category-breadcrumb {
+    background-color: #f8f9fa;
+    padding: 0.75rem 1rem;
+    border-radius: 0.25rem;
+    margin-bottom: 1.5rem;
+}
+
+/* Product List Styles */
+.product-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1.5rem;
+    padding: 1rem 0;
+}
+
+.btn-group {
+    gap: 0.25rem;
+}
+
+.btn-group .btn {
+    border-radius: 4px !important;
+}
+
+/* Add margin to bottom when comparison bar is active */
+.comparison-bar-spacer {
+    height: 80px;
+    display: none;
+}
+
+.comparison-bar.active + .comparison-bar-spacer {
+    display: block;
+} 
