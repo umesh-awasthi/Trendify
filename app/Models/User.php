@@ -6,6 +6,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\DB;
 
 class User extends Authenticatable
 {
@@ -17,10 +18,17 @@ class User extends Authenticatable
      *
      * @var list<string>
      */
+    // Role constants
+    const ROLE_ADMIN = 'admin';
+    const ROLE_CUSTOMER = 'customer';
+    const ROLE_AGENT = 'agent';
+
     protected $fillable = [
         'name',
         'email',
         'password',
+        'role',
+        'permissions',
     ];
 
     /**
@@ -41,5 +49,38 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
+        'permissions' => 'array',
     ];
+
+    /**
+     * Check if user is admin
+     */
+    public function isAdmin(): bool
+    {
+        return $this->role === self::ROLE_ADMIN;
+    }
+
+    /**
+     * Check if user is customer
+     */
+    public function isCustomer(): bool
+    {
+        return $this->role === self::ROLE_CUSTOMER;
+    }
+
+    /**
+     * Check if user is agent
+     */
+    public function isAgent(): bool
+    {
+        return $this->role === self::ROLE_AGENT;
+    }
+
+    /**
+     * Get the user's sessions
+     */
+    public function sessions()
+    {
+        return DB::table('sessions')->where('user_id', $this->id);
+    }
 }

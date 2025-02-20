@@ -126,6 +126,13 @@ class AuthController extends Controller
             return redirect()->route('admin.dashboard');
         }
 
+        // Then try agent login
+        
+        if (Auth::guard('web')->attempt($credentials) && Auth::user()->isAgent()) {
+            $request->session()->regenerate();
+            return redirect()->route('agent.dashboard');
+        }
+
         // Then try customer login
         if (Auth::guard('customer')->attempt($credentials)) {
             $request->session()->regenerate();
@@ -168,6 +175,9 @@ class AuthController extends Controller
     {
         if (Auth::guard('admin')->check()) {
             Auth::guard('admin')->logout();
+        }
+        if (Auth::guard('web')->check() && Auth::user()->isAgent()) {
+            Auth::guard('web')->logout();
         }
         if (Auth::guard('customer')->check()) {
             Auth::guard('customer')->logout();

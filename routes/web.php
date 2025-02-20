@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\PaymentController;
+use App\Http\Controllers\AgentController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\CategoryController;
@@ -9,6 +10,7 @@ use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\AuthController;
 use App\Http\Middleware\AdminAuthMiddleware;
 use App\Http\Middleware\CustomerAuthMiddleware;
+use App\Http\Middleware\AgentAuthMiddleware;
 
 Route::get('/', function () {
     return redirect()->route('products.index');
@@ -65,6 +67,15 @@ Route::middleware(AdminAuthMiddleware::class)->group(function(){
     Route::get('/admin/dashboard', function () {
         return view('admin.dashboard');
     })->name('admin.dashboard');
+    
+    // Agent management routes
+    Route::get('/agent', [AgentController::class, 'index'])->name('admin.agents.index');
+    Route::get('/admin/agents', [AgentController::class, 'getagent'])->name('admin.agents.getagent');
+    Route::get('/admin/agents/create', [AgentController::class, 'createAgent'])->name('admin.agents.create');
+    Route::post('/admin/agents', [AgentController::class, 'storeAgent'])->name('admin.agents.store');
+    Route::get('/admin/agents/{agent}/edit', [AgentController::class, 'editAgentPermissions'])->name('admin.agents.edit');
+    Route::put('/admin/agents/{agent}', [AgentController::class, 'updateAgentPermissions'])->name('admin.agents.update');
+    Route::delete('/admin/agents/{agent}', [AgentController::class, 'destroyAgent'])->name('admin.agents.destroy');
 });
 
 // Customer Dashboard (Protected for Customers)
@@ -72,4 +83,24 @@ Route::middleware(CustomerAuthMiddleware::class)->group(function(){
     Route::get('/customer/dashboard', function () {
         return view('customer.dashboard');
     })->name('customer.dashboard');
+});
+
+// Agent Dashboard (Protected for Agents)
+Route::middleware(AgentAuthMiddleware::class)->group(function(){
+    Route::get('/agent/dashboard', [AgentController::class, 'index'])->name('agent.dashboard');
+    
+    // Agent specific routes
+    Route::get('/agent/customers', [AgentController::class, 'customers'])->name('agent.customers');
+    Route::get('/agent/orders', [AgentController::class, 'orders'])->name('agent.orders');
+    Route::post('/agent/orders/{order}/status', [AgentController::class, 'updateOrderStatus'])->name('agent.orders.update-status');
+    // Product management routes
+    Route::get('/agent/products', [AgentController::class, 'products'])->name('agent.products');
+    Route::get('/agent/products/create', [AgentController::class, 'createProduct'])->name('agent.products.create');
+    Route::post('/agent/products', [AgentController::class, 'storeProduct'])->name('agent.products.store');
+    Route::get('/agent/products/{product}', [AgentController::class, 'showProduct'])->name('agent.products.show');
+    Route::get('/agent/products/{product}/edit', [AgentController::class, 'editProduct'])->name('agent.products.edit');
+    Route::put('/agent/products/{product}', [AgentController::class, 'updateProduct'])->name('agent.products.update');
+    Route::delete('/agent/products/{product}', [AgentController::class, 'destroyProduct'])->name('agent.products.destroy');
+    Route::get('/agent/reports', [AgentController::class, 'reports'])->name('agent.reports');
+    Route::get('/agent/admin-tasks', [AgentController::class, 'adminTasks'])->name('agent.admin-tasks');
 });
