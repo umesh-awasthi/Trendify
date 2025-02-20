@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\PaymentController;
+use App\Http\Controllers\AgentController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\CategoryController;
@@ -80,4 +81,19 @@ Route::middleware(AgentAuthMiddleware::class)->group(function(){
     Route::get('/agent/dashboard', function () {
         return view('agent.dashboard');
     })->name('agent.dashboard');
+    
+    // Agent specific routes
+    Route::get('/agent/customers', [AgentController::class, 'customers'])->name('agent.customers');
+    Route::get('/agent/orders', [AgentController::class, 'orders'])->name('agent.orders');
+    Route::post('/agent/orders/{order}/status', [AgentController::class, 'updateOrderStatus'])->name('agent.orders.update-status');
+    // Product management routes
+    Route::get('/agent/products', [AgentController::class, 'products'])->name('agent.products');
+    Route::get('/agent/products/create', [AgentController::class, 'createProduct'])->name('agent.products.create');
+    Route::post('/agent/products', [AgentController::class, 'storeProduct'])->name('agent.products.store');
+    Route::get('/agent/products/{product}', [AgentController::class, 'showProduct'])->name('agent.products.show');
+    Route::get('/agent/products/{product}/edit', [AgentController::class, 'editProduct'])->name('agent.products.edit');
+    Route::put('/agent/products/{product}', [AgentController::class, 'updateProduct'])->name('agent.products.update');
+    Route::delete('/agent/products/{product}', [AgentController::class, 'destroyProduct'])->name('agent.products.destroy');
+    Route::get('/agent/reports', [AgentController::class, 'reports'])->name('agent.reports');
+    Route::get('/agent/admin-tasks', [AgentController::class, 'adminTasks'])->name('agent.admin-tasks');
 });
