@@ -67,6 +67,15 @@ Route::middleware(AdminAuthMiddleware::class)->group(function(){
     Route::get('/admin/dashboard', function () {
         return view('admin.dashboard');
     })->name('admin.dashboard');
+    
+    // Agent management routes
+    Route::get('/agent', [AgentController::class, 'index'])->name('admin.agents.index');
+    Route::get('/admin/agents', [AgentController::class, 'getagent'])->name('admin.agents.getagent');
+    Route::get('/admin/agents/create', [AgentController::class, 'createAgent'])->name('admin.agents.create');
+    Route::post('/admin/agents', [AgentController::class, 'storeAgent'])->name('admin.agents.store');
+    Route::get('/admin/agents/{agent}/edit', [AgentController::class, 'editAgentPermissions'])->name('admin.agents.edit');
+    Route::put('/admin/agents/{agent}', [AgentController::class, 'updateAgentPermissions'])->name('admin.agents.update');
+    Route::delete('/admin/agents/{agent}', [AgentController::class, 'destroyAgent'])->name('admin.agents.destroy');
 });
 
 // Customer Dashboard (Protected for Customers)
@@ -78,9 +87,7 @@ Route::middleware(CustomerAuthMiddleware::class)->group(function(){
 
 // Agent Dashboard (Protected for Agents)
 Route::middleware(AgentAuthMiddleware::class)->group(function(){
-    Route::get('/agent/dashboard', function () {
-        return view('agent.dashboard');
-    })->name('agent.dashboard');
+    Route::get('/agent/dashboard', [AgentController::class, 'index'])->name('agent.dashboard');
     
     // Agent specific routes
     Route::get('/agent/customers', [AgentController::class, 'customers'])->name('agent.customers');

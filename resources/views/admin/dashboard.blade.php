@@ -30,10 +30,20 @@
                                 </div>
                             </div>
                         </div>
+                        <div class="col-md-4 mb-4">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h5 class="card-title">Agents</h5>
+                                    <p class="card-text">Manage agent accounts</p>
+                                    <a href="{{ route('admin.agents.create') }}" class="btn btn-primary mb-2">Create Agent</a>
+                                    <a href="{{ route('admin.agents.getagent') }}" class="btn btn-secondary">View/Edit Agents</a>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
-@endsection 
+@endsection

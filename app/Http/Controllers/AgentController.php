@@ -10,27 +10,46 @@ use App\Models\Customer;
 
 class AgentController extends Controller
 {
-    /**
-     * Display customers list
-     */
+    public function index()
+    { 
+      try{
+          $agents = User::where('role', 'agent')->first();
+      
+        //   print_r($agent);
+          
+          return view('agent.dashboard', compact('agents'));
+      }catch(\Exception $e){
+        print_r($e->getMessage());
+      }
+
+    }
+
+    public function getagent()
+    { 
+      try{
+          $agents = User::where('role', 'agent')->get();
+      
+        //   print_r($agent);
+          
+          return view('admin.agents.index', compact('agents'));
+      }catch(\Exception $e){
+        print_r($e->getMessage());
+      }
+
+    }
+
     public function customers()
     {
         $customers = Customer::all();
         return view('agent.customers', compact('customers'));
     }
 
-    /**
-     * Display orders list
-     */
     public function orders()
     {
         $orders = Order::with('customer')->get();
         return view('agent.orders', compact('orders'));
     }
 
-    /**
-     * Update order status
-     */
     public function updateOrderStatus(Request $request, Order $order)
     {
         $request->validate([
@@ -41,70 +60,44 @@ class AgentController extends Controller
         return back()->with('success', 'Order status updated successfully');
     }
 
-    /**
-     * Display product management
-     */
     public function products()
     {
         $products = Product::all();
         return view('agent.products', compact('products'));
     }
 
-    /**
-     * Show the form for creating a new product
-     */
     public function createProduct()
     {
         return app(ProductController::class)->create();
     }
 
-    /**
-     * Store a newly created product
-     */
     public function storeProduct(Request $request)
     {
         return app(ProductController::class)->store($request);
     }
 
-    /**
-     * Display the specified product
-     */
     public function showProduct(Product $product)
     {
         return app(ProductController::class)->show($product);
     }
 
-    /**
-     * Show the form for editing the specified product
-     */
     public function editProduct(Product $product)
     {
         return app(ProductController::class)->edit($product);
     }
 
-    /**
-     * Update the specified product
-     */
     public function updateProduct(Request $request, Product $product)
     {
         return app(ProductController::class)->update($request, $product);
     }
 
-    /**
-     * Remove the specified product
-     */
     public function destroyProduct(Product $product)
     {
         return app(ProductController::class)->destroy($product);
     }
-  
 
-    /**
-     * Display reports
-     */
     public function reports()
     {
-        // Generate reports data
         $salesData = Order::selectRaw('DATE(created_at) as date, SUM(total) as total')
             ->groupBy('date')
             ->get();
@@ -112,12 +105,91 @@ class AgentController extends Controller
         return view('agent.reports', compact('salesData'));
     }
 
-    /**
-     * Display admin assistance tasks
-     */
     public function adminTasks()
     {
-        // Placeholder for admin assistance tasks
         return view('agent.admin-tasks');
+    }
+
+    public function createAgent()
+    {
+        return view('admin.create-agent');
+    }
+
+    public function storeAgent(Request $request)
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255|unique:users',
+            'password' => 'required|string|min:8',
+            'permissions' => 'nullable|array'
+        ]);
+
+        $user = User::create([
+            'name' => $request->name,
+            'email' => $request->email,
+            'password' => bcrypt($request->password),
+            'role' => 'agent',
+            'permissions' => json_encode($request->permissions ?? [])
+        ]);
+
+        return redirect()->route('admin.dashboard')
+            ->with('success', 'Agent created successfully');
+    }
+
+    public function editAgentPermissions(User $agent)
+    {
+        $permissions = [
+            'manage_products',
+            'manage_orders',
+            'manage_customers',
+            'view_reports',
+            'admin_tasks'
+        ];
+        
+        return view('admin.edit-agent-permissions', compact('agent', 'permissions'));
+    }
+
+    public function updateAgent(Request $request, User $agent)
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255|unique:users,email,'.$agent->id,
+            'permissions' => 'nullable|array'
+        ]);
+
+        $agent->update([
+            'name' => $request->name,
+            'email' => $request->email,
+            'permissions' => json_encode($request->permissions ?? [])
+        ]);
+
+        return redirect()->route('admin.agents.index')
+            ->with('success', 'Agent updated successfully');
+    }
+
+    public function updateAgentPermissions(Request $request, User $agent)
+    {
+        $request->validate([
+            'permissions' => 'nullable|array'
+        ]);
+
+        $agent->update([
+            'permissions' => json_encode($request->permissions ?? [])
+        ]);
+
+        return redirect()->route('admin.dashboard')
+            ->with('success', 'Agent permissions updated successfully');
+    }
+
+    public function destroyAgent(User $agent)
+    {
+        // Delete related sessions first
+        $agent->sessions()->delete();
+        
+        // Then delete the agent
+        $agent->delete();
+        
+        return redirect()->route('admin.agents.getagent')
+            ->with('success', 'Agent deleted successfully');
     }
 }

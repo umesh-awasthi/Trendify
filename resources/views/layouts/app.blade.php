@@ -100,8 +100,9 @@
                         </li>
                         @elseif(Auth::guard('web')->check())
                         <li class="nav-item">
-                            <a class="nav-link" href="{{ route('agent.dashboard') }}">Agent Account</a>
+                            <a class="nav-link" href="{{ route('agent.dashboard') }}">Agent Dashboard</a>
                         </li>
+                       
                         <li class="nav-item">
                             <form action="{{ route('logout') }}" method="POST" class="d-inline">
                                 @csrf
@@ -155,4 +156,3 @@
     </script>
 </body>
 
-</html>

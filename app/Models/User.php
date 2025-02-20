@@ -6,6 +6,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\DB;
 
 class User extends Authenticatable
 {
@@ -27,6 +28,7 @@ class User extends Authenticatable
         'email',
         'password',
         'role',
+        'permissions',
     ];
 
     /**
@@ -47,6 +49,7 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
+        'permissions' => 'array',
     ];
 
     /**
@@ -71,5 +74,13 @@ class User extends Authenticatable
     public function isAgent(): bool
     {
         return $this->role === self::ROLE_AGENT;
+    }
+
+    /**
+     * Get the user's sessions
+     */
+    public function sessions()
+    {
+        return DB::table('sessions')->where('user_id', $this->id);
     }
 }

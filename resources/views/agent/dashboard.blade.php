@@ -11,74 +11,78 @@
         </div>
 
         <div class="mt-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            @if(auth()->user() && in_array('manage_products', json_decode(auth()->user()->permissions) ?? []))
             <!-- Product Management Card -->
             <div class="bg-white border-2 border-dashed border-gray-500">
-              
                 <div class="p-6 bg-white border-b border-gray-200">
                     <h3 class="text-lg font-medium text-gray-900">Product Management</h3>
                     <div class="mt-4 space-y-3">
-                        <a href="{{ route('agent.products.create') }}" >
-                            <button class=" text-black ">Add New Product</button>
+                        <a href="{{ route('agent.products.create') }}">
+                            <button class="text-black">Add New Product</button>
                         </a>
-                        <a href="{{ route('agent.products') }}" >
-                           <button class=" text-black "> View Products </button>
+                        <a href="{{ route('agent.products') }}">
+                            <button class="text-black">View Products</button>
                         </a>
                     </div>
                 </div>
             </div>
+            @endif
 
+            @if(auth()->user() && in_array('manage_orders', json_decode(auth()->user()->permissions) ?? []))
             <!-- Orders Management Card -->
             <div class="bg-white border-2 border-dashed border-gray-500">
-                
                 <div class="p-6 bg-white border-b border-gray-200">
                     <h3 class="text-lg font-medium text-gray-900">Orders Management</h3>
                     <div class="mt-4 space-y-3">
-                        <a href="{{ route('agent.orders') }}" >
-                            <button class=" text-black text-center"> View Orders</button>
-                            
+                        <a href="{{ route('agent.orders') }}">
+                            <button class="text-black text-center">View Orders</button>
                         </a>
                     </div>
                 </div>
             </div>
+            @endif
 
+            @if(auth()->user() && in_array('manage_customers', json_decode(auth()->user()->permissions) ?? []))
             <!-- Customers Management Card -->
             <div class="bg-white border-2 border-dashed border-gray-500">
-                
+                <div class="p-6 bg-white border-b border-gray-200">
                     <h3 class="text-lg font-medium text-gray-900">Customers Management</h3>
                     <div class="mt-4 space-y-3">
                         <a href="{{ route('agent.customers') }}">
-                            <button class=" text-black">   View Customers</button>
-                          
+                            <button class="text-black">View Customers</button>
                         </a>
                     </div>
                 </div>
             </div>
+            @endif
 
+            @if(auth()->user() && in_array('view_reports', json_decode(auth()->user()->permissions) ?? []))
             <!-- Sales Management Card -->
-            <div class="bg-white border-2 border-dashed border-gray-500"><div class="bg-white overflow-hidden shadow-sm sm:rounded-lg transform transition duration-500 hover:scale-105">
+            <div class="bg-white border-2 border-dashed border-gray-500">
                 <div class="p-6 bg-white border-b border-gray-200">
                     <h3 class="text-lg font-medium text-gray-900">Sales Management</h3>
                     <div class="mt-4 space-y-3">
-                        <a href="{{ route('agent.reports') }}" >
-                            <button class=" text-black text-center "> View Reports</button>
-                    
+                        <a href="{{ route('agent.reports') }}">
+                            <button class="text-black text-center">View Reports</button>
                         </a>
                     </div>
                 </div>
             </div>
+            @endif
 
+            @if(auth()->user() && in_array('admin_tasks', json_decode(auth()->user()->permissions) ?? []))
             <!-- Admin Assistance Tasks Card -->
             <div class="bg-white border-2 border-dashed border-gray-500">
                 <div class="p-6 bg-white border-b border-gray-200">
                     <h3 class="text-lg font-medium text-gray-900">Admin Assistance Tasks</h3>
                     <div class="mt-4 space-y-3">
-                        <a href="{{ route('agent.admin-tasks') }}" >
-                            <button class=" text-black text-center ">   View Tasks</button>
-                          
+                        <a href="{{ route('agent.admin-tasks') }}">
+                            <button class="text-black text-center">View Tasks</button>
                         </a>
                     </div>
                 </div>
             </div>
+            @endif
         </div>
     </div>
 </div>

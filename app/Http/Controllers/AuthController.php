@@ -127,6 +127,7 @@ class AuthController extends Controller
         }
 
         // Then try agent login
+        
         if (Auth::guard('web')->attempt($credentials) && Auth::user()->isAgent()) {
             $request->session()->regenerate();
             return redirect()->route('agent.dashboard');
