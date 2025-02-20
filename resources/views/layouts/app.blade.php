@@ -98,6 +98,16 @@
                                 <button type="submit" class="btn btn-link nav-link">Logout</button>
                             </form>
                         </li>
+                        @elseif(Auth::guard('web')->check())
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ route('agent.dashboard') }}">Agent Account</a>
+                        </li>
+                        <li class="nav-item">
+                            <form action="{{ route('logout') }}" method="POST" class="d-inline">
+                                @csrf
+                                <button type="submit" class="btn btn-link nav-link">Logout</button>
+                            </form>
+                        </li>
                     @else
                         <li class="nav-item">
                             <a class="nav-link" href="{{ route('login') }}">Login</a>

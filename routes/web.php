@@ -9,6 +9,7 @@ use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\AuthController;
 use App\Http\Middleware\AdminAuthMiddleware;
 use App\Http\Middleware\CustomerAuthMiddleware;
+use App\Http\Middleware\AgentAuthMiddleware;
 
 Route::get('/', function () {
     return redirect()->route('products.index');
@@ -72,4 +73,11 @@ Route::middleware(CustomerAuthMiddleware::class)->group(function(){
     Route::get('/customer/dashboard', function () {
         return view('customer.dashboard');
     })->name('customer.dashboard');
+});
+
+// Agent Dashboard (Protected for Agents)
+Route::middleware(AgentAuthMiddleware::class)->group(function(){
+    Route::get('/agent/dashboard', function () {
+        return view('agent.dashboard');
+    })->name('agent.dashboard');
 });

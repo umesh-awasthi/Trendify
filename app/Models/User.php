@@ -17,10 +17,16 @@ class User extends Authenticatable
      *
      * @var list<string>
      */
+    // Role constants
+    const ROLE_ADMIN = 'admin';
+    const ROLE_CUSTOMER = 'customer';
+    const ROLE_AGENT = 'agent';
+
     protected $fillable = [
         'name',
         'email',
         'password',
+        'role',
     ];
 
     /**
@@ -42,4 +48,28 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
     ];
+
+    /**
+     * Check if user is admin
+     */
+    public function isAdmin(): bool
+    {
+        return $this->role === self::ROLE_ADMIN;
+    }
+
+    /**
+     * Check if user is customer
+     */
+    public function isCustomer(): bool
+    {
+        return $this->role === self::ROLE_CUSTOMER;
+    }
+
+    /**
+     * Check if user is agent
+     */
+    public function isAgent(): bool
+    {
+        return $this->role === self::ROLE_AGENT;
+    }
 }
