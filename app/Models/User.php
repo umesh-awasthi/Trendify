@@ -7,11 +7,13 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\DB;
+use Laravel\Sanctum\HasApiTokens;
+
 
 class User extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable;
+    use HasFactory, Notifiable, HasApiTokens;
 
     /**
      * The attributes that are mass assignable.
@@ -82,5 +84,13 @@ class User extends Authenticatable
     public function sessions()
     {
         return DB::table('sessions')->where('user_id', $this->id);
+    }
+
+    /**
+     * Get the customers assigned to this agent
+     */
+    public function customers()
+    {
+        return $this->belongsToMany(Customer::class, 'agent_customer', 'agent_id', 'customer_id');
     }
 }

@@ -96,7 +96,9 @@
             </div>
         </div>
     </div>
-
+    <a href="{{ route('admin.dashboard') }}" class="ml-2 px-4 py-2 mt-2 btn btn-secondary">
+        Back to dashboard?
+    </a>
     <div class="d-flex justify-content-between align-items-center mt-4">
         <div class="text-muted">
             Showing {{ $categories->firstItem() ?? 0 }} to {{ $categories->lastItem() ?? 0 }} of {{ $categories->total() }} categories

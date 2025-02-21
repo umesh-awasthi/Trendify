@@ -2,6 +2,7 @@
 
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\AgentController;
 
 Route::prefix('auth')->group(function () {
     // Public routes
@@ -17,5 +18,13 @@ Route::prefix('auth')->group(function () {
         Route::post('/logout', [AuthController::class, 'apiLogout']);
         // Add other protected routes here, e.g.:
         // Route::get('/profile', [AuthController::class, 'apiProfile']);
+    });
+});
+
+// Agent specific authentication routes
+Route::prefix('agent')->group(function () {
+    Route::post('/login', [AgentController::class, 'apiLogin']);
+    Route::middleware('auth:sanctum')->group(function () {
+        Route::post('/logout', [AgentController::class, 'apiLogout']);
     });
 });

@@ -46,7 +46,11 @@ class AgentController extends Controller
 
     public function orders()
     {
-        $orders = Order::with('customer')->get();
+        $agent = auth()->user();
+        $customerIds = $agent->customers()->pluck('id');
+        $orders = Order::whereIn('customer_id', $customerIds)
+            ->with('customer')
+            ->get();
         return view('agent.orders', compact('orders'));
     }
 
@@ -191,5 +195,86 @@ class AgentController extends Controller
         
         return redirect()->route('admin.agents.getagent')
             ->with('success', 'Agent deleted successfully');
+    }
+
+    public function showAssignCustomersForm(User $agent)
+    {
+        $customers = Customer::all();
+        return view('admin.assign-customers', compact('agent', 'customers'));
+    }
+
+    public function assignCustomers(Request $request, User $agent)
+    {
+        $request->validate([
+            'customers' => 'required|array',
+            'customers.*' => 'exists:customers,id'
+        ]);
+
+        // Assign selected customers to agent
+        $agent->customers()->sync($request->customers);
+
+        return redirect()->route('admin.agents.getagent')
+            ->with('success', 'Customers assigned successfully');
+    }
+
+    public function viewAssignedCustomers(User $agent)
+    {
+        $customers = $agent->customers()->paginate(10);
+        return view('admin.assigned-customers', compact('agent', 'customers'));
+    }
+
+    public function myCustomers()
+    {
+        $agent = auth()->user();
+        $customers = $agent->customers()->paginate(10);
+        return view('agent.my-customers', compact('customers'));
+    }
+
+    /**
+     * Handle agent login via API
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function apiLogin(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|email',
+            'password' => 'required'
+        ]);
+
+        if (!auth()->attempt($request->only('email', 'password'))) {
+            return response()->json([
+                'message' => 'Invalid credentials'
+            ], 401);
+        }
+
+        $agent = auth()->user();
+      
+        if ($agent->role !== 'agent') {
+          
+            auth()->logout();
+            return response()->json([
+                'message' => 'Unauthorized access'
+            ], 403);
+        }
+        // return($agent);
+        $token = $agent->createToken('agent-token')->plainTextToken;
+   
+        return response()->json([
+
+            'token' => $token,
+            'agent' => $agent
+        ]);
+    }
+
+   
+    public function apiLogout(Request $request)
+    {
+        $request->user()->currentAccessToken()->delete();
+
+        return response()->json([
+            'message' => 'Logged out successfully'
+        ]);
     }
 }
