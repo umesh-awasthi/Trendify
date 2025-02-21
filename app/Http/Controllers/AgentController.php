@@ -230,7 +230,51 @@ class AgentController extends Controller
         return view('agent.my-customers', compact('customers'));
     }
 
-   
-    
+    /**
+     * Handle agent login via API
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function apiLogin(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|email',
+            'password' => 'required'
+        ]);
 
+        if (!auth()->attempt($request->only('email', 'password'))) {
+            return response()->json([
+                'message' => 'Invalid credentials'
+            ], 401);
+        }
+
+        $agent = auth()->user();
+      
+        if ($agent->role !== 'agent') {
+          
+            auth()->logout();
+            return response()->json([
+                'message' => 'Unauthorized access'
+            ], 403);
+        }
+        // return($agent);
+        $token = $agent->createToken('agent-token')->plainTextToken;
+   
+        return response()->json([
+
+            'token' => $token,
+            'agent' => $agent
+        ]);
+    }
+
+   
+    public function apiLogout(Request $request)
+    {
+        $request->user()->currentAccessToken()->delete();
+
+        return response()->json([
+            'message' => 'Logged out successfully'
+        ]);
+    }
 }
