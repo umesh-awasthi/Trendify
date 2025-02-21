@@ -95,6 +95,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Models\Admin;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -297,6 +298,61 @@ class AuthController extends Controller
 
         return response()->json([
             'message' => 'Password reset successfully',
+        ]);
+    }
+
+    // API: Send agent password reset link
+    public function sendAgentResetLinkEmail(Request $request)
+    {
+        $request->validate(['email' => 'required|email|exists:users,email']);
+
+        // Generate and store reset token
+        $token = Str::random(60);
+        DB::table('password_reset_tokens')->updateOrInsert(
+            ['email' => $request->email],
+            ['token' => Hash::make($token), 'created_at' => now()]
+        );
+
+        // Generate and log the reset link
+        $resetLink = url('/password/reset?token='.$token);
+        Log::info('Agent password reset link generated for '.$request->email.': '.$resetLink);
+
+        return response()->json([
+            'message' => 'Agent password reset link generated successfully.',
+            'reset_link' => $resetLink,
+            'instructions' => 'Use this link to reset your password. The link will expire in 60 minutes.'
+        ]);
+    }
+
+    // API: Reset agent password
+    public function resetAgentPassword(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|email|exists:users,email',
+            'token' => 'required|string',
+            'password' => 'required|string|min:8|confirmed',
+        ]);
+
+        // Verify token
+        $reset = DB::table('password_reset_tokens')
+            ->where('email', $request->email)
+            ->first();
+
+        if (!$reset || !Hash::check($request->token, $reset->token)) {
+            return response()->json(['message' => 'Invalid token'], 400);
+        }
+
+        // Update password
+        User::where('email', $request->email)
+            ->update(['password' => Hash::make($request->password)]);
+
+        // Delete used token
+        DB::table('password_reset_tokens')
+            ->where('email', $request->email)
+            ->delete();
+
+        return response()->json([
+            'message' => 'Agent password reset successfully',
         ]);
     }
 }
