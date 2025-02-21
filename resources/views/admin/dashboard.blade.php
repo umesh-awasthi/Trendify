@@ -36,7 +36,7 @@
                                     <h5 class="card-title">Agents</h5>
                                     <p class="card-text">Manage agent accounts</p>
                                     <a href="{{ route('admin.agents.create') }}" class="btn btn-primary mb-2">Create Agent</a>
-                                    <a href="{{ route('admin.agents.getagent') }}" class="btn btn-secondary">View/Edit Agents</a>
+                                    <a href="{{ route('admin.agents.getagent') }}" class="btn btn-primary mb-2">View/Edit Agents</a>
                                 </div>
                             </div>
                         </div>

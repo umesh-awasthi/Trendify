@@ -83,4 +83,12 @@ class User extends Authenticatable
     {
         return DB::table('sessions')->where('user_id', $this->id);
     }
+
+    /**
+     * Get the customers assigned to this agent
+     */
+    public function customers()
+    {
+        return $this->belongsToMany(Customer::class, 'agent_customer', 'agent_id', 'customer_id');
+    }
 }

@@ -76,6 +76,9 @@ Route::middleware(AdminAuthMiddleware::class)->group(function(){
     Route::get('/admin/agents/{agent}/edit', [AgentController::class, 'editAgentPermissions'])->name('admin.agents.edit');
     Route::put('/admin/agents/{agent}', [AgentController::class, 'updateAgentPermissions'])->name('admin.agents.update');
     Route::delete('/admin/agents/{agent}', [AgentController::class, 'destroyAgent'])->name('admin.agents.destroy');
+    Route::get('/admin/agents/{agent}/assign-customers', [AgentController::class, 'showAssignCustomersForm'])->name('admin.agents.assign-customers');
+    Route::post('/admin/agents/{agent}/assign-customers', [AgentController::class, 'assignCustomers'])->name('admin.agents.assign-customers.store');
+    Route::get('/admin/agents/{agent}/assigned-customers', [AgentController::class, 'viewAssignedCustomers'])->name('admin.agents.assigned-customers');
 });
 
 // Customer Dashboard (Protected for Customers)
@@ -100,7 +103,8 @@ Route::middleware(AgentAuthMiddleware::class)->group(function(){
     Route::get('/agent/products/{product}', [AgentController::class, 'showProduct'])->name('agent.products.show');
     Route::get('/agent/products/{product}/edit', [AgentController::class, 'editProduct'])->name('agent.products.edit');
     Route::put('/agent/products/{product}', [AgentController::class, 'updateProduct'])->name('agent.products.update');
-    Route::delete('/agent/products/{product}', [AgentController::class, 'destroyProduct'])->name('agent.products.destroy');
+    // Route::delete('/agent/products/{product}', [AgentController::class, 'destroyProduct'])->name('agent.products.destroy');
     Route::get('/agent/reports', [AgentController::class, 'reports'])->name('agent.reports');
     Route::get('/agent/admin-tasks', [AgentController::class, 'adminTasks'])->name('agent.admin-tasks');
+    Route::get('/agent/my-customers', [AgentController::class, 'myCustomers'])->name('agent.my-customers');
 });
