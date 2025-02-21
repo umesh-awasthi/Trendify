@@ -93,6 +93,9 @@
                                 class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-black">
                                 Create Agent
                             </button>
+                            <a href="{{ route('admin.dashboard') }}" class="btn ">
+                                Back to dashboard?
+                            </a>
                         </div>
                     </form>
                 </div>

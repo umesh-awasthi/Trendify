@@ -14,7 +14,8 @@
 
                     <div class="mt-6">
                         <a href="{{ route('admin.agents.create') }}" class="text-black">
-                            Create New Agent
+                           
+                            <button class="mb-2"> Create New Agent </button>
                         </a>
                     </div>
 
@@ -54,9 +55,9 @@
                                                 @endif
                                             </td>
                                             <td class="px-6 py-4 border border-gray-300 whitespace-nowrap text-sm font-medium">
-                                                <a href="{{ route('admin.agents.edit', $agent->id) }}" class="text-indigo-600 hover:text-indigo-900 mr-4">Edit</a>
-                                                <a href="{{ route('admin.agents.assign-customers', $agent->id) }}" class="text-green-600 hover:text-green-900 mr-4">Assign Customers</a>
-                                                <a href="{{ route('admin.agents.assigned-customers', $agent->id) }}" class="text-blue-600 hover:text-blue-900 mr-4">View Customers</a>
+                                                <a href="{{ route('admin.agents.edit', $agent->id) }}" class="text-indigo-600 hover:text-indigo-900 mr-4"><button class="mb-2">Edit</button></a>
+                                                <a href="{{ route('admin.agents.assign-customers', $agent->id) }}" class="text-green-600 hover:text-green-900 mr-4"> <button class="mb-2">Assign Customers</button></a>
+                                                <a href="{{ route('admin.agents.assigned-customers', $agent->id) }}" class="text-blue-600 hover:text-blue-900 mr-4"><button class="mb-2">View Customers</button></a>
                                                 <form action="{{ route('admin.agents.destroy', $agent->id) }}" method="POST" class="inline">
                                                     @csrf
                                                     @method('DELETE')
@@ -72,6 +73,9 @@
                     </div>
                 </div>
             </div>
+            <a href="{{ route('admin.dashboard') }}" class="ml-2 px-4 py-2 bg-gray-500 text-black rounded hover:bg-gray-600">
+              <button class="mt-2">  Back to dashboard?</button>
+            </a>
         </div>
     </div>
 @endsection

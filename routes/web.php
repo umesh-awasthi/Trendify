@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\AgentController;
+use App\Http\Controllers\CustomerController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\CategoryController;
@@ -67,6 +68,10 @@ Route::middleware(AdminAuthMiddleware::class)->group(function(){
     Route::get('/admin/dashboard', function () {
         return view('admin.dashboard');
     })->name('admin.dashboard');
+
+    // Customer management routes
+    Route::get('/admin/customers', [CustomerController::class, 'index'])->name('admin.customers.index');
+    Route::delete('/admin/customers/{customer}', [CustomerController::class, 'destroy'])->name('admin.customers.destroy');
     
     // Agent management routes
     Route::get('/agent', [AgentController::class, 'index'])->name('admin.agents.index');
