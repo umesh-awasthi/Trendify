@@ -22,13 +22,13 @@ Route::prefix('auth')->group(function () {
 });
 
 // Agent specific authentication routes
-Route::prefix('agent')->group(function () {
-    Route::post('/login', [AgentController::class, 'apiLogin']);
-    // Agent password reset routes
-    Route::post('/password/reset', [AuthController::class, 'sendAgentResetLinkEmail']);
-    Route::post('/password/reset/confirm', [AuthController::class, 'resetAgentPassword']);
+// Route::prefix('agent')->group(function () {
+//     Route::post('/login', [AuthController::class, 'apiLogin']);
+//     // Agent password reset routes
+//     Route::post('/password/reset', [AuthController::class, 'sendResetLinkEmail']);
+//     Route::post('/password/reset/confirm', [AuthController::class, 'resetPassword']);
     
-    Route::middleware('auth:sanctum')->group(function () {
-        Route::post('/logout', [AgentController::class, 'apiLogout']);
-    });
-});
+//     Route::middleware('auth:sanctum')->group(function () {
+//         Route::post('/logout', [AuthController::class, 'apiLogout']);
+//     });
+// });
