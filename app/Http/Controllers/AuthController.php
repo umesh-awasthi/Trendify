@@ -1,6 +1,5 @@
 <?php
 
-
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
@@ -12,8 +11,8 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
-
 use App\Models\Customer;
+use Illuminate\Support\Facades\Password;
 
 class AuthController extends Controller
 {
@@ -38,7 +37,6 @@ class AuthController extends Controller
         }
 
         // Then try agent login
-        
         if (Auth::guard('web')->attempt($credentials) && Auth::user()->isAgent()) {
             $request->session()->regenerate();
             return redirect()->route('agent.dashboard');
@@ -97,6 +95,78 @@ class AuthController extends Controller
         $request->session()->invalidate();
         $request->session()->regenerateToken();
         return redirect('/');
+    }
+
+    // Show Admin Login Form
+    public function showAdminLoginForm()
+    {
+        return view('auth.admin_login');
+    }
+
+    // Handle Admin Login
+    public function adminLogin(Request $request)
+    {
+        $credentials = $request->validate([
+            'email' => ['required', 'email'],
+            'password' => ['required'],
+        ]);
+
+        if (Auth::guard('admin')->attempt($credentials)) {
+            $request->session()->regenerate();
+            return redirect()->route('admin.dashboard');
+        }
+
+        return back()->withErrors([
+            'email' => 'The provided credentials do not match our records.',
+        ])->onlyInput('email');
+    }
+
+    // Show Customer Login Form
+    public function showCustomerLoginForm()
+    {
+        return view('auth.customer_login');
+    }
+
+    // Handle Customer Login
+    public function customerLogin(Request $request)
+    {
+        $credentials = $request->validate([
+            'email' => ['required', 'email'],
+            'password' => ['required'],
+        ]);
+
+        if (Auth::guard('customer')->attempt($credentials)) {
+            $request->session()->regenerate();
+            return redirect()->route('customer.dashboard');
+        }
+
+        return back()->withErrors([
+            'email' => 'The provided credentials do not match our records.',
+        ])->onlyInput('email');
+    }
+
+    // Show Agent Login Form
+    public function showAgentLoginForm()
+    {
+        return view('auth.agent_login');
+    }
+
+    // Handle Agent Login
+    public function agentLogin(Request $request)
+    {
+        $credentials = $request->validate([
+            'email' => ['required', 'email'],
+            'password' => ['required'],
+        ]);
+
+        if (Auth::guard('web')->attempt($credentials) && Auth::user()->isAgent()) {
+            $request->session()->regenerate();
+            return redirect()->route('agent.dashboard');
+        }
+
+        return back()->withErrors([
+            'email' => 'The provided credentials do not match our records.',
+        ])->onlyInput('email');
     }
 
     // API: Register a new customer
@@ -163,8 +233,6 @@ class AuthController extends Controller
         ], 401);
     }
 
-
-   
     // API: Logout user (customer or agent)
     public function apiLogout(Request $request)
     {
@@ -175,8 +243,38 @@ class AuthController extends Controller
         ]);
     }
 
-    // API: Send password reset link
+    //  Send password reset link for admin
     public function sendResetLinkEmail(Request $request)
+    {
+        $request->validate(['email' => 'required|email']);
+
+        // Check if email exists in either customers or users table
+        $existsInCustomers = DB::table('customers')->where('email', $request->email)->exists();
+        $existsInUsers = DB::table('users')->where('email', $request->email)->exists();
+
+        if (!$existsInCustomers && !$existsInUsers) {
+            return response()->json([
+                'message' => 'Email not found in our records'
+            ], 404);
+        }
+
+        // Generate and store reset token
+        $token = Str::random(60);
+        DB::table('password_reset_tokens')->updateOrInsert(
+            ['email' => $request->email],
+            ['token' => Hash::make($token), 'created_at' => now()]
+        );
+
+        // Generate and log the reset link
+        $resetLink = url('/password/reset?token='.$token);
+        // Log::info('Password reset link generated for '.$request->email.': '.$resetLink);
+
+        // Redirect to the password reset view
+        // Token is handled internally, no need to pass it in the redirect
+        return redirect()->route('admin.password.request');
+    }
+ // api Send password reset link
+    public function apisendResetLinkEmail(Request $request)
     {
         $request->validate(['email' => 'required|email']);
 
@@ -209,7 +307,7 @@ class AuthController extends Controller
     }
 
     // API: Reset password
-    public function resetPassword(Request $request)
+    public function apiresetPassword(Request $request)
     {
         $request->validate([
             'email' => 'required|email',
@@ -245,4 +343,231 @@ class AuthController extends Controller
         ]);
     }
 
+
+
+
+
+
+    // admin: Reset password
+    public function resetPassword(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|email',
+            'password' => 'required|confirmed|min:8',
+        ]);
+
+        // Verify token
+        $reset = DB::table('password_reset_tokens')
+            ->where('email', $request->email)
+            ->first();
+
+        if (!$reset) {
+            return "Invalid email or token";
+        }
+
+        // Update password in the Admin table
+        Admin::where('email', $request->email)
+            ->update(['password' => Hash::make($request->password)]);
+
+        // Delete used token
+        DB::table('password_reset_tokens')
+            ->where('email', $request->email)
+            ->delete();
+
+        return "Password reset successfully";
+       
+    }
+
+    // Admin Password Reset Functionality
+    public function showAdminResetForm()
+    {
+        return view('auth.admin_password_reset');
+    }
+
+    public function sendAdminResetLinkEmail(Request $request)
+    {
+        $request->validate(['email' => 'required|email|exists:customers,email']);
+
+        // Generate and store reset token
+        $token = Str::random(60);
+        DB::table('password_reset_tokens')->updateOrInsert(
+            ['email' => $request->email],
+            ['token' => Hash::make($token), 'created_at' => now()]
+        );
+
+        // Log the reset link generation
+        // Log::info('Password reset link generated for '.$request->email);
+
+        // Redirect to the password reset request view
+        return redirect()->route('admin.password.reset', ['token' => $token]);
+    }
+
+    public function showAdminResetFormWithToken($token)
+    {
+        return view('auth.password_reset', ['token' => $token]);
+    }
+
+    public function adminReset(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|email',
+            'password' => 'required|confirmed|min:8',
+        ]);
+
+        // Verify token
+        $reset = DB::table('password_reset_tokens')
+            ->where('email', $request->email)
+            ->first();
+
+        if (!$reset) {
+            return "Invalid email or token" ;
+        }
+
+        // Update password in the Admin table
+        Admin::where('email', $request->email)
+            ->update(['password' => Hash::make($request->password)]);
+
+            return "Password reset successfully.";
+
+    }
+
+    // Customer Password Reset
+    public function showCustomerResetForm()
+    {
+        return view('auth.customer_password_reset');
+    }
+
+    public function sendCustomerResetLinkEmail(Request $request)
+    {
+        $request->validate(['email' => 'required|email']);
+
+        // Check if email exists in the customers table
+        $existsInCustomers = Customer::where('email', $request->email)->exists();
+
+        if (!$existsInCustomers) {
+            return "Email not found in our records";
+            
+        }
+
+        // Generate and store reset token
+        $token = Str::random(60);
+        DB::table('password_reset_tokens')->updateOrInsert(
+            ['email' => $request->email],
+            ['token' => Hash::make($token), 'created_at' => now()]
+        );
+
+        // Generate and log the reset link
+        $resetLink = url('/customer/password/reset?token='.$token);
+        // Log::info('Password reset link generated for '.$request->email.': '.$resetLink);
+
+        // Redirect to the password reset view
+        return redirect()->route('customer.password.reset', ['token' => $token]);
+    }
+
+    public function showCustomerResetFormWithToken($token)
+    {
+        return view('auth.custopassword_reset', ['token' => $token]);
+    }
+
+    public function customerReset(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|email',
+            'password' => 'required|confirmed|min:8',
+        ]);
+
+        // Verify token
+        $reset = DB::table('password_reset_tokens')
+            ->where('email', $request->email)
+            ->first();
+
+        if (!$reset) {
+            return "Invalid email or token";
+        }
+
+        // Update password in the Customer table
+        Customer::where('email', $request->email)
+            ->update(['password' => Hash::make($request->password)]);
+
+        // Delete used token
+        DB::table('password_reset_tokens')
+            ->where('email', $request->email)
+            ->delete();
+
+        return response()->json([
+            'message' => 'Password reset successfully',
+        ]);
+    }
+
+    // Agent Password Reset
+    public function showAgentResetForm()
+    {
+        return view('auth.agent_password_reset');
+    }
+
+    public function sendAgentResetLinkEmail(Request $request)
+   
+    {
+        $request->validate(['email' => 'required|email']);
+    
+        // Check if email exists in the users table
+        $existsInUsers = User::where('email', $request->email)->exists();
+    
+        if (!$existsInUsers) {
+            return "Email not found in our records";
+       
+        }
+    
+        // Generate and store reset token
+        $token = Str::random(60);
+        DB::table('password_reset_tokens')->updateOrInsert(
+            ['email' => $request->email],
+            ['token' => Hash::make($token), 'created_at' => now()]
+        );
+    
+        // Generate and log the reset link
+        $resetLink = url('/agent/password/reset?token='.$token);
+    //    Log::info('Password reset link generated for '.$request->email.': '.$resetLink);
+    
+        // Redirect to the password reset view
+        return redirect()->route('agent.password.reset', ['token' => $token]);
+    }
+
+    public function showAgentResetFormWithToken($token)
+    {
+        return view('auth.agentpassword_reset', ['token' => $token]);
+    }
+
+    public function agentReset(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|email',
+            'password' => 'required|confirmed|min:8',
+        ]);
+
+        // Verify token
+        $reset = DB::table('password_reset_tokens')
+            ->where('email', $request->email)
+            ->first();
+
+        if (!$reset) {
+            return "Invalid email or token";
+        }
+
+        // Update password in the Customer table
+        User::where('email', $request->email)
+            ->update(['password' => Hash::make($request->password)]);
+
+        // Delete used token
+        DB::table('password_reset_tokens')
+            ->where('email', $request->email)
+            ->delete();
+
+        return response()->json([
+            'message' => 'Password reset successfully',
+        ]);
+    }
+
+    
+   
 }

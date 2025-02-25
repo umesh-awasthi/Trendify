@@ -9,6 +9,8 @@ use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\GlobalConfigurationController;
+
 use App\Http\Middleware\AdminAuthMiddleware;
 use App\Http\Middleware\CustomerAuthMiddleware;
 use App\Http\Middleware\AgentAuthMiddleware;
@@ -48,12 +50,47 @@ Route::get('/categories/create', [CategoryController::class, 'create'])->name('c
 Route::get('/categories/{category}/edit', [CategoryController::class, 'edit'])->name('category.edit');
 Route::get('/categories/{category}', [CategoryController::class, 'show'])->name('category.show');
 
-// Authentication Routes (Admin & Customer in One Controller)
+// Authentication Routes (Admin, Customer, and Agent)
 Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [AuthController::class, 'login']);
+
+// Admin Login Routes
+Route::get('/admin/login', [AuthController::class, 'showAdminLoginForm'])->name('admin.login');
+Route::post('/admin/login', [AuthController::class, 'adminLogin']);
+
+// Customer Login Routes
+Route::get('/customer/login', [AuthController::class, 'showCustomerLoginForm'])->name('customer.login');
+Route::post('/customer/login', [AuthController::class, 'customerLogin']);
+
+// Agent Login Routes
+Route::get('/agent/login', [AuthController::class, 'showAgentLoginForm'])->name('agent.login');
+Route::post('/agent/login', [AuthController::class, 'agentLogin']);
 Route::get('/register', [AuthController::class, 'showRegistrationForm'])->name('register');
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+
+// Password Reset Routes
+Route::prefix('admin')->group(function() {
+    Route::get('/password/forget', [AuthController::class, 'showAdminResetForm'])->name('admin.password.request');
+    Route::post('/password/email', [AuthController::class, 'sendAdminResetLinkEmail'])->name('admin.password.email');
+    Route::get('/password/reset/{token}', [AuthController::class, 'showAdminResetFormWithToken'])->name('admin.password.reset');
+    Route::post('/password/reset', [AuthController::class, 'adminReset'])->name('admin.password.update');
+    
+});
+
+Route::prefix('customer')->group(function() {
+    Route::get('/password/forget', [AuthController::class, 'showCustomerResetForm'])->name('customer.password.request');
+    Route::post('/password/email', [AuthController::class, 'sendCustomerResetLinkEmail'])->name('customer.password.email');
+    Route::get('/password/reset/{token}', [AuthController::class, 'showCustomerResetFormWithToken'])->name('customer.password.reset');
+    Route::post('/password/reset', [AuthController::class, 'customerReset'])->name('customer.password.update');
+});
+
+Route::prefix('agent')->group(function() {
+    Route::get('/password/forget', [AuthController::class, 'showAgentResetForm'])->name('agent.password.request');
+    Route::post('/password/email', [AuthController::class, 'sendAgentResetLinkEmail'])->name('agent.password.email');
+    Route::get('/password/reset/{token}', [AuthController::class, 'showAgentResetFormWithToken'])->name('agent.password.reset');
+    Route::post('/password/reset', [AuthController::class, 'agentReset'])->name('agent.password.update');
+});
 
 // Comparison functionality
 Route::get('/compare', [ProductController::class, 'compare'])->name('products.compare');
@@ -84,32 +121,22 @@ Route::middleware(AdminAuthMiddleware::class)->group(function(){
     Route::get('/admin/agents/{agent}/assign-customers', [AgentController::class, 'showAssignCustomersForm'])->name('admin.agents.assign-customers');
     Route::post('/admin/agents/{agent}/assign-customers', [AgentController::class, 'assignCustomers'])->name('admin.agents.assign-customers.store');
     Route::get('/admin/agents/{agent}/assigned-customers', [AgentController::class, 'viewAssignedCustomers'])->name('admin.agents.assigned-customers');
-});
-
-// Customer Dashboard (Protected for Customers)
-Route::middleware(CustomerAuthMiddleware::class)->group(function(){
-    Route::get('/customer/dashboard', function () {
-        return view('customer.dashboard');
-    })->name('customer.dashboard');
-});
-
-// Agent Dashboard (Protected for Agents)
-Route::middleware(AgentAuthMiddleware::class)->group(function(){
-    Route::get('/agent/dashboard', [AgentController::class, 'index'])->name('agent.dashboard');
     
-    // Agent specific routes
-    Route::get('/agent/customers', [AgentController::class, 'customers'])->name('agent.customers');
-    Route::get('/agent/orders', [AgentController::class, 'orders'])->name('agent.orders');
-    Route::post('/agent/orders/{order}/status', [AgentController::class, 'updateOrderStatus'])->name('agent.orders.update-status');
-    // Product management routes
-    Route::get('/agent/products', [AgentController::class, 'products'])->name('agent.products');
-    Route::get('/agent/products/create', [AgentController::class, 'createProduct'])->name('agent.products.create');
-    Route::post('/agent/products', [AgentController::class, 'storeProduct'])->name('agent.products.store');
-    Route::get('/agent/products/{product}', [AgentController::class, 'showProduct'])->name('agent.products.show');
-    Route::get('/agent/products/{product}/edit', [AgentController::class, 'editProduct'])->name('agent.products.edit');
-    Route::put('/agent/products/{product}', [AgentController::class, 'updateProduct'])->name('agent.products.update');
-    // Route::delete('/agent/products/{product}', [AgentController::class, 'destroyProduct'])->name('agent.products.destroy');
-    Route::get('/agent/reports', [AgentController::class, 'reports'])->name('agent.reports');
-    Route::get('/agent/admin-tasks', [AgentController::class, 'adminTasks'])->name('agent.admin-tasks');
-    Route::get('/agent/my-customers', [AgentController::class, 'myCustomers'])->name('agent.my-customers');
+    // Global Configuration Routes
+  
+    Route::get('/admin/global-configuration/bridge_data', function () {
+        return view('admin.bridge_data');
+    })->name('admin.bridge_data');
+
+    Route::post('/admin/global-configuration/bridge_data', [GlobalConfigurationController::class, 'save'])->name('admin.bridge_data.save');
+    Route::get('/admin/global-configuration/great_schools', function () {
+        return view('admin.great_schools');
+    })->name('admin.great_schools');
+
+    Route::post('/admin/global-configuration/great_schools', [GlobalConfigurationController::class, 'save'])->name('admin.great_schools.save');
+    Route::get('/admin/global-configuration/walkscore', function () {
+        return view('admin.walkscore');
+    })->name('admin.walkscore');
+
+    Route::post('/admin/global-configuration/walkscore', [GlobalConfigurationController::class, 'save'])->name('admin.walkscore.save');
 });

@@ -11,7 +11,7 @@
     <nav aria-label="breadcrumb" class="category-breadcrumb">
         <ol class="breadcrumb">
             <li class="breadcrumb-item">
-                <a href="{{ route('category.index') }}">Categories</a>
+                <a href="{{ route('category.index') }}">Property Categories</a>
             </li>
             @if($category->parent)
                 <li class="breadcrumb-item">
