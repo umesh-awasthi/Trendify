@@ -9,6 +9,8 @@ use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\GlobalConfigurationController;
+
 use App\Http\Middleware\AdminAuthMiddleware;
 use App\Http\Middleware\CustomerAuthMiddleware;
 use App\Http\Middleware\AgentAuthMiddleware;
@@ -119,32 +121,22 @@ Route::middleware(AdminAuthMiddleware::class)->group(function(){
     Route::get('/admin/agents/{agent}/assign-customers', [AgentController::class, 'showAssignCustomersForm'])->name('admin.agents.assign-customers');
     Route::post('/admin/agents/{agent}/assign-customers', [AgentController::class, 'assignCustomers'])->name('admin.agents.assign-customers.store');
     Route::get('/admin/agents/{agent}/assigned-customers', [AgentController::class, 'viewAssignedCustomers'])->name('admin.agents.assigned-customers');
-});
-
-// Customer Dashboard (Protected for Customers)
-Route::middleware(CustomerAuthMiddleware::class)->group(function(){
-    Route::get('/customer/dashboard', function () {
-        return view('customer.dashboard');
-    })->name('customer.dashboard');
-});
-
-// Agent Dashboard (Protected for Agents)
-Route::middleware(AgentAuthMiddleware::class)->group(function(){
-    Route::get('/agent/dashboard', [AgentController::class, 'index'])->name('agent.dashboard');
     
-    // Agent specific routes
-    Route::get('/agent/customers', [AgentController::class, 'customers'])->name('agent.customers');
-    Route::get('/agent/orders', [AgentController::class, 'orders'])->name('agent.orders');
-    Route::post('/agent/orders/{order}/status', [AgentController::class, 'updateOrderStatus'])->name('agent.orders.update-status');
-    // Product management routes
-    Route::get('/agent/products', [AgentController::class, 'products'])->name('agent.products');
-    Route::get('/agent/products/create', [AgentController::class, 'createProduct'])->name('agent.products.create');
-    Route::post('/agent/products', [AgentController::class, 'storeProduct'])->name('agent.products.store');
-    Route::get('/agent/products/{product}', [AgentController::class, 'showProduct'])->name('agent.products.show');
-    Route::get('/agent/products/{product}/edit', [AgentController::class, 'editProduct'])->name('agent.products.edit');
-    Route::put('/agent/products/{product}', [AgentController::class, 'updateProduct'])->name('agent.products.update');
-    // Route::delete('/agent/products/{product}', [AgentController::class, 'destroyProduct'])->name('agent.products.destroy');
-    Route::get('/agent/reports', [AgentController::class, 'reports'])->name('agent.reports');
-    Route::get('/agent/admin-tasks', [AgentController::class, 'adminTasks'])->name('agent.admin-tasks');
-    Route::get('/agent/my-customers', [AgentController::class, 'myCustomers'])->name('agent.my-customers');
+    // Global Configuration Routes
+  
+    Route::get('/admin/global-configuration/bridge_data', function () {
+        return view('admin.bridge_data');
+    })->name('admin.bridge_data');
+
+    Route::post('/admin/global-configuration/bridge_data', [GlobalConfigurationController::class, 'save'])->name('admin.bridge_data.save');
+    Route::get('/admin/global-configuration/great_schools', function () {
+        return view('admin.great_schools');
+    })->name('admin.great_schools');
+
+    Route::post('/admin/global-configuration/great_schools', [GlobalConfigurationController::class, 'save'])->name('admin.great_schools.save');
+    Route::get('/admin/global-configuration/walkscore', function () {
+        return view('admin.walkscore');
+    })->name('admin.walkscore');
+
+    Route::post('/admin/global-configuration/walkscore', [GlobalConfigurationController::class, 'save'])->name('admin.walkscore.save');
 });

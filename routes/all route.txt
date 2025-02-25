@@ -47,3 +47,5 @@ Route::get('/customer/dashboard', function () {
     return view('customer.dashboard');
 })->name('customer.dashboard');
 
+// app name:Laravel
+// app password:gnls hblr ensj fzgu
