@@ -10,8 +10,8 @@ Route::prefix('auth')->group(function () {
     Route::post('/login', [AuthController::class, 'apiLogin']);
 
     // Password reset routes
-    Route::post('/password/reset', [AuthController::class, 'sendResetLinkEmail']);
-    Route::post('/password/reset/confirm', [AuthController::class, 'resetPassword']);
+    Route::post('/password/reset', [AuthController::class, 'apisendResetLinkEmail']);
+    Route::post('/password/reset/confirm', [AuthController::class, 'apiresetPassword']);
 
     // Protected routes (require authentication)
     Route::middleware('auth:sanctum')->group(function () {

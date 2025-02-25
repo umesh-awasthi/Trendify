@@ -48,12 +48,47 @@ Route::get('/categories/create', [CategoryController::class, 'create'])->name('c
 Route::get('/categories/{category}/edit', [CategoryController::class, 'edit'])->name('category.edit');
 Route::get('/categories/{category}', [CategoryController::class, 'show'])->name('category.show');
 
-// Authentication Routes (Admin & Customer in One Controller)
+// Authentication Routes (Admin, Customer, and Agent)
 Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [AuthController::class, 'login']);
+
+// Admin Login Routes
+Route::get('/admin/login', [AuthController::class, 'showAdminLoginForm'])->name('admin.login');
+Route::post('/admin/login', [AuthController::class, 'adminLogin']);
+
+// Customer Login Routes
+Route::get('/customer/login', [AuthController::class, 'showCustomerLoginForm'])->name('customer.login');
+Route::post('/customer/login', [AuthController::class, 'customerLogin']);
+
+// Agent Login Routes
+Route::get('/agent/login', [AuthController::class, 'showAgentLoginForm'])->name('agent.login');
+Route::post('/agent/login', [AuthController::class, 'agentLogin']);
 Route::get('/register', [AuthController::class, 'showRegistrationForm'])->name('register');
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+
+// Password Reset Routes
+Route::prefix('admin')->group(function() {
+    Route::get('/password/forget', [AuthController::class, 'showAdminResetForm'])->name('admin.password.request');
+    Route::post('/password/email', [AuthController::class, 'sendAdminResetLinkEmail'])->name('admin.password.email');
+    Route::get('/password/reset/{token}', [AuthController::class, 'showAdminResetFormWithToken'])->name('admin.password.reset');
+    Route::post('/password/reset', [AuthController::class, 'adminReset'])->name('admin.password.update');
+    
+});
+
+Route::prefix('customer')->group(function() {
+    Route::get('/password/forget', [AuthController::class, 'showCustomerResetForm'])->name('customer.password.request');
+    Route::post('/password/email', [AuthController::class, 'sendCustomerResetLinkEmail'])->name('customer.password.email');
+    Route::get('/password/reset/{token}', [AuthController::class, 'showCustomerResetFormWithToken'])->name('customer.password.reset');
+    Route::post('/password/reset', [AuthController::class, 'customerReset'])->name('customer.password.update');
+});
+
+Route::prefix('agent')->group(function() {
+    Route::get('/password/forget', [AuthController::class, 'showAgentResetForm'])->name('agent.password.request');
+    Route::post('/password/email', [AuthController::class, 'sendAgentResetLinkEmail'])->name('agent.password.email');
+    Route::get('/password/reset/{token}', [AuthController::class, 'showAgentResetFormWithToken'])->name('agent.password.reset');
+    Route::post('/password/reset', [AuthController::class, 'agentReset'])->name('agent.password.update');
+});
 
 // Comparison functionality
 Route::get('/compare', [ProductController::class, 'compare'])->name('products.compare');
