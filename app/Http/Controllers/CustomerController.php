@@ -19,11 +19,14 @@ class CustomerController extends Controller
     }
 
     /**
-     * Remove the specified customer from storage.
+     * Display the customer dashboard.
      *
-     * @param  int  $id
      * @return \Illuminate\Http\Response
      */
+    public function dashboard()
+    {
+        return view('customer.dashboard'); // Ensure this view exists
+    }
     public function destroy($id)
     {
         $customer = Customer::findOrFail($id);
