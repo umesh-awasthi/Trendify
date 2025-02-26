@@ -74,7 +74,17 @@
                             </div>
 
                         </div>
-
         
-
+        <!-- New Manage Property Card -->
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Manage Properties</h5>
+                    <p class="card-text">Add, edit, or delete properties.</p>
+                    <a href="{{ route('properties.index') }}" class="btn btn-primary">Manage Properties</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 @endsection

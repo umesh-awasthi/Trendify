@@ -9,6 +9,7 @@ use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\PropertyController;
 use App\Http\Controllers\GlobalConfigurationController;
 
 use App\Http\Middleware\AdminAuthMiddleware;
@@ -140,3 +141,22 @@ Route::middleware(AdminAuthMiddleware::class)->group(function(){
 
     Route::post('/admin/global-configuration/walkscore', [GlobalConfigurationController::class, 'save'])->name('admin.walkscore.save');
 });
+
+// Agent Dashboard
+Route::middleware(AgentAuthMiddleware::class)->group(function() {
+    Route::get('/agent/dashboard', function () {
+        return view('agent.dashboard');
+    })->name('agent.dashboard');
+    Route::get('/agent/orders', [AgentController::class, 'orders'])->name('agent.orders');
+    Route::get('/agent/products', [AgentController::class, 'products'])->name('agent.products');
+    Route::get('/agent/my-customers', [AgentController::class, 'myCustomers'])->name('agent.my-customers');
+    Route::get('/agent/report', [AgentController::class, 'report'])->name('agent.reports');
+    Route::get('/agent/admin-tasks', [AgentController::class, 'adminTasks'])->name('agent.admin-tasks');
+});
+
+// Customer Dashboard Route
+Route::middleware(CustomerAuthMiddleware::class)->group(function() {
+    Route::get('/customer/dashboard', [CustomerController::class, 'dashboard'])->name('customer.dashboard');
+});
+
+Route::resource('properties', PropertyController::class);
